@@ -13,8 +13,6 @@ namespace Mao.Repository
     {
         string ConnectionString { get; }
         IDbConnection CreateConnection();
-        IDbTransaction BeginTransaction();
-        IDbTransaction BeginTransaction(IsolationLevel il);
 
         #region For Dapper
         int Execute(string sql, object param, IDbTransaction transaction = null, int? commandTimeout = null);

@@ -18,21 +18,6 @@ namespace Mao.Repository
         public abstract string ConnectionString { get; }
         public abstract IDbConnection CreateConnection();
 
-        public virtual IDbTransaction BeginTransaction()
-        {
-            var conn = CreateConnection();
-            conn.Open();
-            var tran = conn.BeginTransaction();
-            return new DbTransactionWrapper(tran);
-        }
-        public virtual IDbTransaction BeginTransaction(IsolationLevel il)
-        {
-            var conn = CreateConnection();
-            conn.Open();
-            var tran = conn.BeginTransaction(il);
-            return new DbTransactionWrapper(tran);
-        }
-
         protected virtual Compiler Compiler => throw new NotImplementedException();
 
         #region For Dapper
