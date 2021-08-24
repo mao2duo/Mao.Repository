@@ -233,113 +233,6 @@ namespace Mao.Repository
         }
         #endregion
         #region For SqlKata To Dapper
-        #region Func<Query, Query> To Query
-        /// <summary>
-        /// Execute parameterized SQL.
-        /// </summary>
-        public virtual int Execute(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null)
-        {
-            return this.Execute(Compiler.Compile(queryFunc(new Query())), transaction, commandTimeout);
-        }
-        /// <summary>
-        /// Execute parameterized SQL that selects a single value.
-        /// </summary>
-        public virtual object ExecuteScalar(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null)
-        {
-            return this.ExecuteScalar(Compiler.Compile(queryFunc(new Query())), transaction, commandTimeout);
-        }
-        /// <summary>
-        /// Execute parameterized SQL that selects a single value.
-        /// </summary>
-        public virtual T ExecuteScalar<T>(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null)
-        {
-            return this.ExecuteScalar<T>(Compiler.Compile(queryFunc(new Query())), transaction, commandTimeout);
-        }
-        /// <summary>
-        /// Execute parameterized SQL and return an System.Data.IDataReader.
-        /// </summary>
-        public virtual IDataReader ExecuteReader(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null)
-        {
-            return this.ExecuteReader(Compiler.Compile(queryFunc(new Query())), transaction, commandTimeout);
-        }
-        /// <summary>
-        /// Return a sequence of dynamic objects with properties matching the columns.
-        /// </summary>
-        public virtual IEnumerable<dynamic> Query(Func<Query, Query> queryFunc, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null)
-        {
-            return this.Query(Compiler.Compile(queryFunc(new Query())), transaction, buffered, commandTimeout);
-        }
-        /// <summary>
-        /// Executes a query, returning the data typed as T.
-        /// </summary>
-        public virtual IEnumerable<T> Query<T>(Func<Query, Query> queryFunc, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null)
-        {
-            return this.Query<T>(Compiler.Compile(queryFunc(new Query())), transaction, buffered, commandTimeout);
-        }
-        /// <summary>
-        /// Return a dynamic object with properties matching the columns.
-        /// </summary>
-        public virtual dynamic QueryFirst(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null)
-        {
-            return this.QueryFirst(Compiler.Compile(queryFunc(new Query())), transaction, commandTimeout);
-        }
-        /// <summary>
-        /// Executes a single-row query, returning the data typed as T.
-        /// </summary>
-        public virtual T QueryFirst<T>(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null)
-        {
-            return this.QueryFirst<T>(Compiler.Compile(queryFunc(new Query())), transaction, commandTimeout);
-        }
-        /// <summary>
-        /// Return a dynamic object with properties matching the columns.
-        /// </summary>
-        public virtual dynamic QueryFirstOrDefault(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null)
-        {
-            return this.QueryFirstOrDefault(Compiler.Compile(queryFunc(new Query())), transaction, commandTimeout);
-        }
-        /// <summary>
-        /// Executes a single-row query, returning the data typed as T.
-        /// </summary>
-        public virtual T QueryFirstOrDefault<T>(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null)
-        {
-            return this.QueryFirstOrDefault<T>(Compiler.Compile(queryFunc(new Query())), transaction, commandTimeout);
-        }
-        /// <summary>
-        /// Return a dynamic object with properties matching the columns.
-        /// </summary>
-        public virtual dynamic QuerySingle(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null)
-        {
-            return this.QuerySingle(Compiler.Compile(queryFunc(new Query())), transaction, commandTimeout);
-        }
-        /// <summary>
-        /// Executes a single-row query, returning the data typed as T.
-        /// </summary>
-        public virtual T QuerySingle<T>(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null)
-        {
-            return this.QuerySingle<T>(Compiler.Compile(queryFunc(new Query())), transaction, commandTimeout);
-        }
-        /// <summary>
-        /// Return a dynamic object with properties matching the columns.
-        /// </summary>
-        public virtual dynamic QuerySingleOrDefault(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null)
-        {
-            return this.QuerySingleOrDefault(Compiler.Compile(queryFunc(new Query())), transaction, commandTimeout);
-        }
-        /// <summary>
-        /// Executes a single-row query, returning the data typed as T.
-        /// </summary>
-        public virtual T QuerySingleOrDefault<T>(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null)
-        {
-            return this.QuerySingleOrDefault<T>(Compiler.Compile(queryFunc(new Query())), transaction, commandTimeout);
-        }
-        /// <summary>
-        /// Execute a command that returns multiple result sets, and access each in turn.
-        /// </summary>
-        public virtual SqlMapper.GridReader QueryMultiple(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null)
-        {
-            return this.QueryMultiple(Compiler.Compile(queryFunc(new Query())), transaction, commandTimeout);
-        }
-        #endregion
         #region Query To SqlResult
         /// <summary>
         /// Execute parameterized SQL.
@@ -615,226 +508,205 @@ namespace Mao.Repository
         public virtual int Count<TModel>(string whereName, object whereValue, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.QueryFirst<int>(q => q
-                .From(tableName)
-                .Where(whereName, whereValue)
-                .AsCount(),
+            return this.QueryFirst<int>(
+                new Query(tableName)
+                    .Where(whereName, whereValue)
+                    .AsCount(),
                 transaction);
         }
         public virtual int Count<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.QueryFirst<int>(q => q
-                .From(tableName)
-                .Where(whereColumns)
-                .AsCount(),
+            return this.QueryFirst<int>(
+                new Query(tableName)
+                    .Where(whereColumns)
+                    .AsCount(),
                 transaction);
         }
-        public virtual TModel SelectFirstOrDefault<TModel>(string whereName, object whereValue, IDbTransaction transaction = null)
+        public virtual TModel SelectTop1<TModel>(string whereName, object whereValue, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.QueryFirstOrDefault<TModel>(q => q
-                .From(tableName)
-                .Where(whereName, whereValue)
-                .Take(1),
+            return this.QueryFirstOrDefault<TModel>(
+                new Query(tableName)
+                    .Where(whereName, whereValue)
+                    .Take(1),
                 transaction);
         }
-        public virtual TModel SelectFirstOrDefault<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, IDbTransaction transaction = null)
+        public virtual TModel SelectTop1<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.QueryFirstOrDefault<TModel>(q => q
-                .From(tableName)
-                .Where(whereColumns)
-                .Take(1),
+            return this.QueryFirstOrDefault<TModel>(
+                new Query(tableName)
+                    .Where(whereColumns)
+                    .Take(1),
                 transaction);
         }
-        public virtual TModel SelectFirstOrDefault<TModel>(string whereName, object whereValue, string sortName, ListSortDirection sortDirection, IDbTransaction transaction = null)
+        public virtual TModel SelectTop1<TModel>(string whereName, object whereValue, string sortName, ListSortDirection sortDirection, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.QueryFirstOrDefault<TModel>(q =>
+            Query query = new Query(tableName)
+                .Where(whereName, whereValue);
+            switch (sortDirection)
             {
-                q = q.From(tableName)
-                    .Where(whereName, whereValue);
-                switch (sortDirection)
+                case ListSortDirection.Ascending:
+                default:
+                    query = query.OrderBy(sortName);
+                    break;
+                case ListSortDirection.Descending:
+                    query = query.OrderByDesc(sortName);
+                    break;
+            }
+            query = query.Take(1);
+            return this.QueryFirstOrDefault<TModel>(query, transaction);
+        }
+        public virtual TModel SelectTop1<TModel>(string whereName, object whereValue, IEnumerable<KeyValuePair<string, ListSortDirection>> sortColumns, IDbTransaction transaction = null)
+        {
+            string tableName = this.GetTableName(typeof(TModel));
+            Query query = new Query(tableName)
+                .Where(whereName, whereValue);
+            foreach (var sortColumn in sortColumns)
+            {
+                switch (sortColumn.Value)
                 {
                     case ListSortDirection.Ascending:
                     default:
-                        q = q.OrderBy(sortName);
+                        query = query.OrderBy(sortColumn.Key);
                         break;
                     case ListSortDirection.Descending:
-                        q = q.OrderByDesc(sortName);
+                        query = query.OrderByDesc(sortColumn.Key);
                         break;
                 }
-                return q.Take(1);
-            }, transaction);
+            }
+            query = query.Take(1);
+            return this.QueryFirstOrDefault<TModel>(query, transaction);
         }
-        public virtual TModel SelectFirstOrDefault<TModel>(string whereName, object whereValue, IEnumerable<KeyValuePair<string, ListSortDirection>> sortColumns, IDbTransaction transaction = null)
+        public virtual TModel SelectTop1<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, string sortName, ListSortDirection sortDirection, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.QueryFirstOrDefault<TModel>(q =>
+            Query query = new Query(tableName)
+                .Where(whereColumns);
+            switch (sortDirection)
             {
-                q = q.From(tableName)
-                    .Where(whereName, whereValue);
-                foreach (var sortColumn in sortColumns)
-                {
-                    switch (sortColumn.Value)
-                    {
-                        case ListSortDirection.Ascending:
-                        default:
-                            q = q.OrderBy(sortColumn.Key);
-                            break;
-                        case ListSortDirection.Descending:
-                            q = q.OrderByDesc(sortColumn.Key);
-                            break;
-                    }
-                }
-                return q.Take(1);
-            }, transaction);
+                case ListSortDirection.Ascending:
+                default:
+                    query = query.OrderBy(sortName);
+                    break;
+                case ListSortDirection.Descending:
+                    query = query.OrderByDesc(sortName);
+                    break;
+            }
+            query = query.Take(1);
+            return this.QueryFirstOrDefault<TModel>(query, transaction);
         }
-        public virtual TModel SelectFirstOrDefault<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, string sortName, ListSortDirection sortDirection, IDbTransaction transaction = null)
+        public virtual TModel SelectTop1<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, IEnumerable<KeyValuePair<string, ListSortDirection>> sortColumns, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.QueryFirstOrDefault<TModel>(q =>
+            Query query = new Query(tableName)
+                .Where(whereColumns);
+            foreach (var sortColumn in sortColumns)
             {
-                q = q.From(tableName)
-                    .Where(whereColumns);
-                switch (sortDirection)
+                switch (sortColumn.Value)
                 {
                     case ListSortDirection.Ascending:
                     default:
-                        q = q.OrderBy(sortName);
+                        query = query.OrderBy(sortColumn.Key);
                         break;
                     case ListSortDirection.Descending:
-                        q = q.OrderByDesc(sortName);
+                        query = query.OrderByDesc(sortColumn.Key);
                         break;
                 }
-                return q.Take(1);
-            }, transaction);
-        }
-        public virtual TModel SelectFirstOrDefault<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, IEnumerable<KeyValuePair<string, ListSortDirection>> sortColumns, IDbTransaction transaction = null)
-        {
-            string tableName = this.GetTableName(typeof(TModel));
-            return this.QueryFirstOrDefault<TModel>(q =>
-            {
-                q = q.From(tableName)
-                    .Where(whereColumns);
-                foreach (var sortColumn in sortColumns)
-                {
-                    switch (sortColumn.Value)
-                    {
-                        case ListSortDirection.Ascending:
-                        default:
-                            q = q.OrderBy(sortColumn.Key);
-                            break;
-                        case ListSortDirection.Descending:
-                            q = q.OrderByDesc(sortColumn.Key);
-                            break;
-                    }
-                }
-                return q.Take(1);
-            }, transaction);
+            }
+            query = query.Take(1);
+            return this.QueryFirstOrDefault<TModel>(query, transaction);
         }
         public virtual IEnumerable<TModel> Select<TModel>(string whereName, object whereValue, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.Query<TModel>(q => q
-                .From(tableName)
+            return this.Query<TModel>(new Query(tableName)
                 .Where(whereName, whereValue),
                 transaction);
         }
         public virtual IEnumerable<TModel> Select<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.Query<TModel>(q => q
-                .From(tableName)
-                .Where(whereColumns),
+            return this.Query<TModel>(
+                new Query(tableName)
+                    .Where(whereColumns),
                 transaction);
         }
         public virtual IEnumerable<TModel> Select<TModel>(string whereName, object whereValue, string sortName, ListSortDirection sortDirection, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.Query<TModel>(q =>
+            Query query = new Query(tableName)
+                .Where(whereName, whereValue);
+            switch (sortDirection)
             {
-                q = q.From(tableName)
-                    .Where(whereName, whereValue);
-                switch (sortDirection)
-                {
-                    case ListSortDirection.Ascending:
-                    default:
-                        q = q.OrderBy(sortName);
-                        break;
-                    case ListSortDirection.Descending:
-                        q = q.OrderByDesc(sortName);
-                        break;
-                }
-                return q;
-            }, transaction);
+                case ListSortDirection.Ascending:
+                default:
+                    query = query.OrderBy(sortName);
+                    break;
+                case ListSortDirection.Descending:
+                    query = query.OrderByDesc(sortName);
+                    break;
+            }
+            return this.Query<TModel>(query, transaction);
         }
         public virtual IEnumerable<TModel> Select<TModel>(string whereName, object whereValue, IEnumerable<KeyValuePair<string, ListSortDirection>> sortColumns, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.Query<TModel>(q =>
+            Query query = new Query(tableName)
+                .Where(whereName, whereValue);
+            foreach (var sortColumn in sortColumns)
             {
-                q = q.From(tableName)
-                    .Where(whereName, whereValue);
-                foreach (var sortColumn in sortColumns)
+                switch (sortColumn.Value)
                 {
-                    switch (sortColumn.Value)
-                    {
-                        case ListSortDirection.Ascending:
-                        default:
-                            q = q.OrderBy(sortColumn.Key);
-                            break;
-                        case ListSortDirection.Descending:
-                            q = q.OrderByDesc(sortColumn.Key);
-                            break;
-                    }
+                    case ListSortDirection.Ascending:
+                    default:
+                        query = query.OrderBy(sortColumn.Key);
+                        break;
+                    case ListSortDirection.Descending:
+                        query = query.OrderByDesc(sortColumn.Key);
+                        break;
                 }
-                return q;
-            }, transaction);
+            }
+            return this.Query<TModel>(query, transaction);
         }
         public virtual IEnumerable<TModel> Select<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, string sortName, ListSortDirection sortDirection, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.Query<TModel>(q =>
+            Query query = new Query(tableName)
+                .Where(whereColumns);
+            switch (sortDirection)
             {
-                q = q.From(tableName)
-                    .Where(whereColumns);
-                switch (sortDirection)
-                {
-                    case ListSortDirection.Ascending:
-                    default:
-                        q = q.OrderBy(sortName);
-                        break;
-                    case ListSortDirection.Descending:
-                        q = q.OrderByDesc(sortName);
-                        break;
-                }
-                return q;
-            }, transaction);
+                case ListSortDirection.Ascending:
+                default:
+                    query = query.OrderBy(sortName);
+                    break;
+                case ListSortDirection.Descending:
+                    query = query.OrderByDesc(sortName);
+                    break;
+            }
+            return this.Query<TModel>(query, transaction);
         }
         public virtual IEnumerable<TModel> Select<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, IEnumerable<KeyValuePair<string, ListSortDirection>> sortColumns, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.Query<TModel>(q =>
+            Query query = new Query(tableName)
+                .Where(whereColumns);
+            foreach (var sortColumn in sortColumns)
             {
-                q = q.From(tableName)
-                    .Where(whereColumns);
-                foreach (var sortColumn in sortColumns)
+                switch (sortColumn.Value)
                 {
-                    switch (sortColumn.Value)
-                    {
-                        case ListSortDirection.Ascending:
-                        default:
-                            q = q.OrderBy(sortColumn.Key);
-                            break;
-                        case ListSortDirection.Descending:
-                            q = q.OrderByDesc(sortColumn.Key);
-                            break;
-                    }
+                    case ListSortDirection.Ascending:
+                    default:
+                        query = query.OrderBy(sortColumn.Key);
+                        break;
+                    case ListSortDirection.Descending:
+                        query = query.OrderByDesc(sortColumn.Key);
+                        break;
                 }
-                return q;
-            }, transaction);
+            }
+            return this.Query<TModel>(query, transaction);
         }
         public virtual int Insert<TModel>(TModel model, IDbTransaction transaction = null)
         {
@@ -846,9 +718,9 @@ namespace Mao.Repository
                 throw new NotSupportedException();
             }
             var namedBindings = this.GetColumnNamedBindings(insertProperties, model);
-            return this.Execute(q => q
-                .From(tableName)
-                .AsInsert(namedBindings),
+            return this.Execute(
+                new Query(tableName)
+                    .AsInsert(namedBindings),
                 transaction);
         }
         public virtual int Insert<TModel>(TModel model, out decimal identity, IDbTransaction transaction = null)
@@ -861,9 +733,9 @@ namespace Mao.Repository
                 throw new NotSupportedException();
             }
             var namedBindings = this.GetColumnNamedBindings(insertProperties, model);
-            identity = this.QueryFirst<decimal>(q => q
-                .From(tableName)
-                .AsInsert(namedBindings, true),
+            identity = this.QueryFirst<decimal>(
+                new Query(tableName)
+                    .AsInsert(namedBindings, true),
                 transaction);
             throw new NotImplementedException();
         }
@@ -901,10 +773,10 @@ namespace Mao.Repository
                 .Except(keyProperties)
                 .Except(this.GetDatabaseGeneratedProperties(typeof(TModel), DatabaseGeneratedOption.Computed, DatabaseGeneratedOption.Identity));
             var namedBindings = this.GetColumnNamedBindings(updateProperties, model);
-            return this.Execute(q => q
-                .From(tableName)
-                .Where(this.GetColumnNamedBindings(keyProperties, model))
-                .AsUpdate(namedBindings),
+            return this.Execute(
+                new Query(tableName)
+                    .Where(this.GetColumnNamedBindings(keyProperties, model))
+                    .AsUpdate(namedBindings),
                 transaction);
         }
         public virtual int Update<TModel>(TModel model, IEnumerable<string> updateColumnNames, IDbTransaction transaction = null)
@@ -925,10 +797,10 @@ namespace Mao.Repository
                     throw new NotSupportedException();
                 }
                 var namedBindings = this.GetColumnNamedBindings(updateProperties, model);
-                return this.Execute(q => q
-                    .From(tableName)
-                    .Where(this.GetColumnNamedBindings(keyProperties, model))
-                    .AsUpdate(namedBindings),
+                return this.Execute(
+                    new Query(tableName)
+                        .Where(this.GetColumnNamedBindings(keyProperties, model))
+                        .AsUpdate(namedBindings),
                     transaction);
             }
             return 0;
@@ -955,10 +827,10 @@ namespace Mao.Repository
                 foreach (var model in models)
                 {
                     var namedBindings = this.GetColumnNamedBindings(updateProperties, model);
-                    count += this.Execute(q => q
-                        .From(tableName)
-                        .Where(this.GetColumnNamedBindings(keyProperties, model))
-                        .AsUpdate(namedBindings),
+                    count += this.Execute(
+                        new Query(tableName)
+                            .Where(this.GetColumnNamedBindings(keyProperties, model))
+                            .AsUpdate(namedBindings),
                         transaction);
                 }
                 return count;
@@ -998,10 +870,10 @@ namespace Mao.Repository
                 foreach (var model in models)
                 {
                     var namedBindings = this.GetColumnNamedBindings(updateProperties, model);
-                    count += this.Execute(q => q
-                        .From(tableName)
-                        .Where(this.GetColumnNamedBindings(keyProperties, model))
-                        .AsUpdate(namedBindings),
+                    count += this.Execute(
+                        new Query(tableName)
+                            .Where(this.GetColumnNamedBindings(keyProperties, model))
+                            .AsUpdate(namedBindings),
                         transaction);
                 }
                 return count;
@@ -1030,19 +902,19 @@ namespace Mao.Repository
         public virtual int Update<TModel>(IEnumerable<KeyValuePair<string, object>> updateColumns, string whereName, object whereValue, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.Execute(q => q
-                .From(tableName)
-                .Where(whereName, whereValue)
-                .AsUpdate(updateColumns),
+            return this.Execute(
+                new Query(tableName)
+                    .Where(whereName, whereValue)
+                    .AsUpdate(updateColumns),
                 transaction);
         }
         public virtual int Update<TModel>(IEnumerable<KeyValuePair<string, object>> updateColumns, IEnumerable<KeyValuePair<string, object>> whereColumns, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.Execute(q => q
-                .From(tableName)
-                .Where(whereColumns)
-                .AsUpdate(updateColumns),
+            return this.Execute(
+                new Query(tableName)
+                    .Where(whereColumns)
+                    .AsUpdate(updateColumns),
                 transaction);
         }
         public virtual int UpdateIgnore<TModel>(TModel model, IEnumerable<string> ignoreColumnNames, IDbTransaction transaction = null)
@@ -1061,10 +933,10 @@ namespace Mao.Repository
                 throw new NotSupportedException();
             }
             var namedBindings = this.GetColumnNamedBindings(updateProperties, model);
-            return this.Execute(q => q
-                .From(tableName)
-                .Where(this.GetColumnNamedBindings(keyProperties, model))
-                .AsUpdate(namedBindings),
+            return this.Execute(
+                new Query(tableName)
+                    .Where(this.GetColumnNamedBindings(keyProperties, model))
+                    .AsUpdate(namedBindings),
                 transaction);
         }
         public virtual int UpdateIgnore<TModel>(IEnumerable<TModel> models, IEnumerable<string> ignoreColumnNames, IDbTransaction transaction = null)
@@ -1089,10 +961,10 @@ namespace Mao.Repository
                 foreach (var model in models)
                 {
                     var namedBindings = this.GetColumnNamedBindings(updateProperties, model);
-                    count += this.Execute(q => q
-                        .From(tableName)
-                        .Where(this.GetColumnNamedBindings(keyProperties, model))
-                        .AsUpdate(namedBindings),
+                    count += this.Execute(
+                        new Query(tableName)
+                            .Where(this.GetColumnNamedBindings(keyProperties, model))
+                            .AsUpdate(namedBindings),
                         transaction);
                 }
                 return count;
@@ -1118,10 +990,10 @@ namespace Mao.Repository
             {
                 throw new NotSupportedException();
             }
-            return this.Execute(q => q
-                .From(tableName)
-                .Where(this.GetColumnNamedBindings(keyProperties, model))
-                .AsDelete(),
+            return this.Execute(
+                new Query(tableName)
+                    .Where(this.GetColumnNamedBindings(keyProperties, model))
+                    .AsDelete(),
                 transaction);
         }
         public virtual int Delete<TModel>(IEnumerable<TModel> models, IDbTransaction transaction = null)
@@ -1144,19 +1016,19 @@ namespace Mao.Repository
         public virtual int Delete<TModel>(string whereName, object whereValue, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.Execute(q => q
-                .From(tableName)
-                .Where(whereName, whereValue)
-                .AsDelete(),
+            return this.Execute(
+                new Query(tableName)
+                    .Where(whereName, whereValue)
+                    .AsDelete(),
                 transaction);
         }
         public virtual int Delete<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, IDbTransaction transaction = null)
         {
             string tableName = this.GetTableName(typeof(TModel));
-            return this.Execute(q => q
-                .From(tableName)
-                .Where(whereColumns)
-                .AsDelete(),
+            return this.Execute(
+                new Query(tableName)
+                    .Where(whereColumns)
+                    .AsDelete(),
                 transaction);
         }
         #endregion

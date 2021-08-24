@@ -32,21 +32,6 @@ namespace Mao.Repository
         SqlMapper.GridReader QueryMultiple(string sql, object param, IDbTransaction transaction = null, int? commandTimeout = null);
         #endregion
         #region For SqlKata To Dapper
-        int Execute(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null);
-        object ExecuteScalar(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null);
-        T ExecuteScalar<T>(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null);
-        IDataReader ExecuteReader(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null);
-        IEnumerable<dynamic> Query(Func<Query, Query> queryFunc, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null);
-        IEnumerable<T> Query<T>(Func<Query, Query> queryFunc, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null);
-        dynamic QueryFirst(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null);
-        T QueryFirst<T>(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null);
-        dynamic QueryFirstOrDefault(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null);
-        T QueryFirstOrDefault<T>(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null);
-        dynamic QuerySingle(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null);
-        T QuerySingle<T>(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null);
-        dynamic QuerySingleOrDefault(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null);
-        T QuerySingleOrDefault<T>(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null);
-        SqlMapper.GridReader QueryMultiple(Func<Query, Query> queryFunc, IDbTransaction transaction = null, int? commandTimeout = null);
         int Execute(Query query, IDbTransaction transaction = null, int? commandTimeout = null);
         object ExecuteScalar(Query query, IDbTransaction transaction = null, int? commandTimeout = null);
         T ExecuteScalar<T>(Query query, IDbTransaction transaction = null, int? commandTimeout = null);
@@ -83,12 +68,12 @@ namespace Mao.Repository
         string GetColumnName(PropertyInfo property);
         int Count<TModel>(string whereName, object whereValue, IDbTransaction transaction = null);
         int Count<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, IDbTransaction transaction = null);
-        TModel SelectFirstOrDefault<TModel>(string whereName, object whereValue, IDbTransaction transaction = null);
-        TModel SelectFirstOrDefault<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, IDbTransaction transaction = null);
-        TModel SelectFirstOrDefault<TModel>(string whereName, object whereValue, string sortName, ListSortDirection sortDirection, IDbTransaction transaction = null);
-        TModel SelectFirstOrDefault<TModel>(string whereName, object whereValue, IEnumerable<KeyValuePair<string, ListSortDirection>> sortColumns, IDbTransaction transaction = null);
-        TModel SelectFirstOrDefault<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, string sortName, ListSortDirection sortDirection, IDbTransaction transaction = null);
-        TModel SelectFirstOrDefault<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, IEnumerable<KeyValuePair<string, ListSortDirection>> sortColumns, IDbTransaction transaction = null);
+        TModel SelectTop1<TModel>(string whereName, object whereValue, IDbTransaction transaction = null);
+        TModel SelectTop1<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, IDbTransaction transaction = null);
+        TModel SelectTop1<TModel>(string whereName, object whereValue, string sortName, ListSortDirection sortDirection, IDbTransaction transaction = null);
+        TModel SelectTop1<TModel>(string whereName, object whereValue, IEnumerable<KeyValuePair<string, ListSortDirection>> sortColumns, IDbTransaction transaction = null);
+        TModel SelectTop1<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, string sortName, ListSortDirection sortDirection, IDbTransaction transaction = null);
+        TModel SelectTop1<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, IEnumerable<KeyValuePair<string, ListSortDirection>> sortColumns, IDbTransaction transaction = null);
         IEnumerable<TModel> Select<TModel>(string whereName, object whereValue, IDbTransaction transaction = null);
         IEnumerable<TModel> Select<TModel>(IEnumerable<KeyValuePair<string, object>> whereColumns, IDbTransaction transaction = null);
         IEnumerable<TModel> Select<TModel>(string whereName, object whereValue, string sortName, ListSortDirection sortDirection, IDbTransaction transaction = null);
